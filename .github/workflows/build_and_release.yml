@@ -97,17 +97,23 @@ jobs:
       - name: Build macOS
         run: flutter build macos --release
 
-      - name: Create macOS ZIP
+      - name: Create macOS DMG
         run: |
           cd build/macos/Build/Products/Release
-          zip -r sim_simi-macos.zip sim_simi.app
-          mv sim_simi-macos.zip $GITHUB_WORKSPACE/
+          # Create temporary directory for DMG
+          mkdir -p dmg_temp
+          cp -r SimSimi.app dmg_temp/
+          # Create DMG using hdiutil
+          hdiutil create -volname "SimSimi" -srcfolder dmg_temp -ov -format UDZO SimSimi-macOS.dmg
+          mv SimSimi-macOS.dmg $GITHUB_WORKSPACE/
+          cd $GITHUB_WORKSPACE
+          rm -rf build/macos/Build/Products/Release/dmg_temp
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-app
-          path: sim_simi-macos.zip
+          path: SimSimi-macOS.dmg
           retention-days: 7
 
   # Build Windows executable
@@ -183,7 +189,7 @@ jobs:
               - ARM 32-bit (older phones)
               - x86_64 (emulators/tablets)
             - **iOS**: IPA file (requires sideloading)
-            - **macOS**: ZIP file containing .app bundle
+            - **macOS**: DMG installer
             - **Windows**: ZIP file with executable
             
             ### 🌟 Features
@@ -196,7 +202,7 @@ jobs:
             ### 📝 Installation
             - **Android**: Download APK and install (enable "Unknown sources" in settings)
             - **iOS**: Requires Xcode or sideloading tools
-            - **macOS**: Extract ZIP and drag to Applications folder
+            - **macOS**: Open DMG and drag app to Applications folder
             - **Windows**: Extract ZIP and run sim_simi.exe
             
             ---
@@ -206,7 +212,7 @@ jobs:
           files: |
             artifacts/android-apk/*.apk
             artifacts/ios-ipa/*.ipa
-            artifacts/macos-app/*.zip
+            artifacts/macos-app/*.dmg
             artifacts/windows-app/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
