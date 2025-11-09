@@ -80,6 +80,13 @@ class _SplashScreenState extends State<SplashScreen>
                           child: Image.asset(
                             'assets/images/app_logo.png',
                             fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.chat_bubble_rounded,
+                                size: 80,
+                                color: Color(0xFF3D3D3D),
+                              );
+                            },
                           ),
                         ),
                       ),

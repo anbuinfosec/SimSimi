@@ -11,7 +11,8 @@ import 'screens/developer_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/about_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
